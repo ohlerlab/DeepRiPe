@@ -203,3 +203,76 @@ def seqlogo_fig(letter_heights, vocab="DNA", figsize=(10, 2), ncol=1, plot_name=
                 pln = plot_name
             ax.set_title(pln)
     return fig
+    
+    
+    
+import math
+def seqlogo_fig_cross(letter_heights, vocab="DNA", figsize=(10, 2), ncol=1, plot_name=None, crosssite=False, cross_positions=None,axisplot=True):
+    """
+    # Arguments
+        plot_name: Title of the plot. Can be a list of names
+    """
+    
+    params = {'axes.labelsize': 10, # fontsize for x and y labels (was 10)
+              'axes.titlesize': 10,
+              'font.size': 10,
+              'legend.fontsize': 10, # was 10
+              'xtick.labelsize': 8,
+              'ytick.labelsize': 8,
+              'text.usetex': False,
+              'font.family': 'serif',
+          'pdf.fonttype' : 42 
+    }
+
+    import matplotlib
+    from matplotlib.ticker import FormatStrFormatter
+    matplotlib.rcParams.update(params)
+    
+    fig = plt.figure(figsize=figsize)
+
+    if len(letter_heights.shape) == 3:
+        #
+        n_plots = letter_heights.shape[2]
+        nrow = math.ceil(n_plots / ncol)
+        if isinstance(plot_name, list):
+            assert len(plot_name) == n_plots
+    else:
+        n_plots = 1
+        nrow = 1
+        ncol = 1
+
+    for i in range(n_plots):
+        if len(letter_heights.shape) == 3:
+            w_cur = letter_heights[:, :, i]
+        else:
+            w_cur = letter_heights
+        ax = plt.subplot(nrow, ncol, i + 1)
+        plt.tight_layout(h_pad=0.01)
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        if not axisplot:
+            plt.box(False)
+            plt.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+            plt.tick_params(axis='y', which='both', right=False, left=False, labelleft=False)
+        # plot the motif
+        seqlogo(w_cur, vocab, ax)
+        if crosssite:
+            if len(letter_heights.shape) == 3:
+                start = cross_positions[i][0]
+                end = cross_positions[i][1]
+            else:
+                start = cross_positions[0]
+                end = cross_positions[1]
+            ax.axvline(x=start,color="purple", linewidth=1)
+            ax.axvline(x=end,color="purple", linewidth=1)
+        # add the title
+        if plot_name is not None:
+            if n_plots > 0:
+                if isinstance(plot_name, list):
+                    pln = plot_name[i]
+                else:
+                    pln = plot_name + " {0}".format(i)
+            else:
+                pln = plot_name
+            ax.set_title(pln)
+    return fig
+

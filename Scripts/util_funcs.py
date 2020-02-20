@@ -65,7 +65,26 @@ def seq_to_mat(seq):
             seq_code[0:4,i] = np.tile(0.25,4)
     return np.transpose(seq_code)
 
-
+def seq_to_1hot(seq,randomsel=True):
+	'converts the sequence to one-hot encoding'
+	import random
+	seq_len = len(seq)
+	seq= seq.upper()
+	seq_code = np.zeros((4,seq_len), dtype='int')
+	for i in range(seq_len):
+		nt = seq[i]
+		if nt == 'A':
+		    seq_code[0,i] = 1
+		elif nt == 'C':
+		    seq_code[1,i] = 1
+		elif nt == 'G':
+		    seq_code[2,i] = 1
+		elif nt == 'T':
+		    seq_code[3,i] = 1
+		elif randomsel:
+		    rn = random.randint(0,3)
+		    seq_code[rn,i] = 1
+	return seq_code
 ##########################################################
 ### Function to convert the region to one-hot encode ###
 ##########################################################
